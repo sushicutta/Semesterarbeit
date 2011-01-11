@@ -1,13 +1,11 @@
 package server.business.boundry;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -19,34 +17,27 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import server.business.entity.Product;
-import server.business.persistence.RegistrationBean;
 
 import com.sun.jersey.api.NotFoundException;
 
-@Stateless
 @Path("products")
+@Stateless
 public class ProductRegistrationService {
 
-	@EJB
-	RegistrationBean registrationBean;
-
+    @PersistenceContext
+    EntityManager em;
+    
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public List<Product> getAllProducts() {
 		
 		System.out.println(">>> get all Products");
-
-		Map<Integer, Product> sortedProductDirectory = registrationBean.getAll();
 		
-		List<Product> sortedProductList = new ArrayList<Product>(sortedProductDirectory.values());
-		Collections.sort(sortedProductList);
+		@SuppressWarnings("unchecked")
+		List<Product> sortedProductList = em.createNamedQuery(Product.ALL).getResultList();
 		
 		return sortedProductList;
 		
-	}
-	
-	public Map<Integer, Product> getProductDirectory() {
-		return registrationBean.getAll();
 	}
 	
 	@POST
@@ -55,10 +46,10 @@ public class ProductRegistrationService {
 		
 		try {
 			
-			Integer primaryKey = registrationBean.register(product);
-			System.out.println(">>> Registered " + product + " with key " + primaryKey);
+			em.persist(product);
+			System.out.println(">>> Registered " + product + " with key " + product.getId());
 
-			return Response.created(URI.create("/" + primaryKey)).build();
+			return Response.created(URI.create("/" + product.getId())).build();
 
 		} catch (Exception e) {
 			throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
@@ -69,17 +60,19 @@ public class ProductRegistrationService {
 	@Path("{primaryKey}")
 	public ProductResource findById(@PathParam("primaryKey") String primaryKeyAsString) {
 		
-		Integer primaryKey;
+		Long primaryKey;
 		try {
-			primaryKey = Integer.valueOf(primaryKeyAsString);
+			primaryKey = Long.valueOf(primaryKeyAsString);
 		} catch (NumberFormatException nfe) {
 			throw new NotFoundException();
 		}
 		
-		Product product = registrationBean.get(primaryKey);
+		Product product = em.find(Product.class, primaryKey);
 		if (product == null) {
 			throw new NotFoundException();
 		}
-		return new ProductResource(primaryKey, registrationBean.get(primaryKey), registrationBean);
+		
+		return new ProductResource(em.find(Product.class, primaryKey));
+
 	}
 }

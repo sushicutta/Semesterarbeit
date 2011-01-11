@@ -24,8 +24,8 @@
 	<h:form>
 		<h:dataTable id="produkte" headerClass="list-header"
 			rowClasses="list-row" styleClass="list-background"
-			value="#{index.sortedProductDirectory}"
-			var="productWithKey">
+			value="#{index.products}"
+			var="product">
 			<f:facet name="header">
         <h:outputText value="Show Products" />
       </f:facet>
@@ -33,19 +33,19 @@
         <f:facet name="header">
           <h:outputText value="Id" />
         </f:facet>
-        <h:outputText value="#{productWithKey.key}" />
+        <h:outputText value="#{product.id}" />
       </h:column> 
 			<h:column>
 				<f:facet name="header">
 					<h:outputText value="Name" />
 				</f:facet>
-				<h:outputText value="#{productWithKey.value.name}" />
+				<h:outputText value="#{product.name}" />
 			</h:column>
 			<h:column>
 				<f:facet name="header">
 					<h:outputText value="Number of Units" />
 				</f:facet>
-				<h:outputText value="#{productWithKey.value.numberOfUnits}" />
+				<h:outputText value="#{product.numberOfUnits}" />
 			</h:column>
 		</h:dataTable>
 	</h:form>
