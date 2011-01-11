@@ -35,7 +35,7 @@ public class Index {
     @PostConstruct
     public void init(){
     	product = new Product();
-    	sortedProducts = getProducts();
+    	sortedProducts = getAllProducts();
     }
     
     public String register(){
@@ -48,8 +48,12 @@ public class Index {
         return product;
     }
     
-    public List<Product> getProducts() {
+    public List<Product> getAllProducts() {
     	return productRegistrationService.getAllProducts();
+    }
+    
+    public List<Product> getProducts() {
+    	return sortedProducts;
     }
 
 }

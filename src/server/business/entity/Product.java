@@ -35,6 +35,10 @@ public class Product implements Comparable<Product> {
 		this.numberOfUnits = numberOfUnits;
 	}
 	
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
     public Long getId() {
         return id;
     }
