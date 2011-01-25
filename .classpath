@@ -13,5 +13,11 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="lib/hessian-4.0.7.jar" sourcepath="lib/src/hessian-4.0.7-src.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/junit-4.8.2.jar" sourcepath="lib/src/junit-4.8.2-src.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

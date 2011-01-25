@@ -1,6 +1,8 @@
 package server.presentation.registration;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -12,7 +14,11 @@ import server.business.entity.Product;
 
 @Presenter
 public class Index {
-
+	
+	private static final Logger logger = Logger.getLogger("server.presentation.registration.Index");
+	
+	private static final String endpointDescription = ">>> From Faces 2.0";
+	
 	@EJB
     ProductRegistrationService productRegistrationService;
 
@@ -39,7 +45,9 @@ public class Index {
     }
     
     public String register(){
-        System.out.println("From CDI");
+		if (logger.isLoggable(Level.INFO)) {
+			logger.info(endpointDescription + " :: register()");
+		}
         productRegistrationService.register(product);
         return "confirm";
     }
@@ -49,6 +57,9 @@ public class Index {
     }
     
     public List<Product> getAllProducts() {
+		if (logger.isLoggable(Level.INFO)) {
+			logger.info(endpointDescription + " :: getAllProducts()");
+		}
     	return productRegistrationService.getAllProducts();
     }
     
