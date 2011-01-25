@@ -2,10 +2,11 @@ package server.business.boundry;
 
 import java.net.URI;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -18,6 +19,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import server.business.boundry.eao.EntityNotFoundException;
+import server.business.boundry.eao.ProductEao;
 import server.business.entity.Product;
 
 import com.sun.jersey.api.NotFoundException;
@@ -25,18 +28,23 @@ import com.sun.jersey.api.NotFoundException;
 @Path("products")
 @Stateless
 public class ProductRegistrationService {
+	
+	private static final Logger logger = Logger.getLogger("server.business.boundry.ProductRegistrationService");
+	
+	private static final String serviceDescription = ">>> From REST";
 
-    @PersistenceContext
-    EntityManager em;
-    
+	@EJB
+	ProductEao eao;
+	
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public List<Product> getAllProducts() {
+	public List<Product> allProducts() {
 		
-		System.out.println(">>> get all Products");
+		if (logger.isLoggable(Level.INFO)) {
+			logger.info(serviceDescription + " :: allProducts()");			
+		}
 		
-		@SuppressWarnings("unchecked")
-		List<Product> sortedProductList = em.createNamedQuery(Product.ALL).getResultList();
+		List<Product> sortedProductList = eao.allProducts();
 		
 		return sortedProductList;
 		
@@ -46,8 +54,13 @@ public class ProductRegistrationService {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response register(Product product) {
 		
-		if (product.getId() != null) {
-			Product productDbo = em.find(Product.class, product.getId());
+		if (product.hasId()) {
+			Product productDbo = null;
+			try {
+				productDbo = eao.find(product.getId());
+			} catch (EntityNotFoundException e) {
+				// can happen
+			}
 			if (productDbo != null) {
 				throw new WebApplicationException(Response.Status.CONFLICT);
 			}
@@ -56,9 +69,13 @@ public class ProductRegistrationService {
 		product.setId(null);
 		
 		try {
-			em.persist(product);
-			System.out.println(">>> Registered " + product + " with key " + product.getId());
-
+			
+			eao.persist(product);
+			
+			if (logger.isLoggable(Level.INFO)) {
+				logger.info(serviceDescription + " :: register()");			
+			}
+			
 			return Response.created(URI.create("/" + product.getId())).build();
 
 		} catch (Exception e) {
@@ -67,6 +84,10 @@ public class ProductRegistrationService {
 		}
 
 	}
+	
+	// Scheint ein Bug zu sein, dass es nicht richtig mit der ProductResource funktioniert.
+	// Desshalb ist diese Methode auskommentiert.
+	
 //	
 //	@Path("{primaryKey}")
 //	public ProductResource findById(@PathParam("primaryKey") String primaryKeyAsString) {
@@ -100,12 +121,17 @@ public class ProductRegistrationService {
 			throw new NotFoundException();
 		}
 		
-		Product product = em.find(Product.class, primaryKey);
-		if (product == null) {
+		Product product;
+		try {
+			product = eao.find(primaryKey);
+		} catch (EntityNotFoundException e) {
 			throw new NotFoundException();
 		}
-		
-		System.out.println("get Product: " + product + " with key " + product.getId());
+
+		if (logger.isLoggable(Level.INFO)) {
+			logger.info(serviceDescription + " :: get(" + primaryKeyAsString + ")");			
+		}
+
 		return product;
 	}
 
@@ -120,13 +146,23 @@ public class ProductRegistrationService {
 			throw new NotFoundException();
 		}
 		
-		Product product = em.find(Product.class, primaryKey);
-		if (product == null) {
+		Product product = null;
+		try {
+			product = eao.find(primaryKey);
+		} catch (EntityNotFoundException e) {
 			throw new NotFoundException();
 		}
 		
-		System.out.println("delete Product " + product + " with key " + product.getId());
-		em.remove(product);
+		try {
+			eao.remove(product.getId());
+		} catch (EntityNotFoundException e) {
+			throw new NotFoundException();
+		}
+
+		if (logger.isLoggable(Level.INFO)) {
+			logger.info(serviceDescription + " :: delete(" + primaryKeyAsString + ")");			
+		}
+		
 		return Response.ok().build();
 	}
 
@@ -141,16 +177,17 @@ public class ProductRegistrationService {
 		} catch (NumberFormatException nfe) {
 			throw new NotFoundException();
 		}
-		
-		Product productDbo = em.find(Product.class, primaryKey);
-		if (productDbo == null) {
+
+		try {
+			eao.merge(primaryKey, product);
+		} catch (EntityNotFoundException e) {
 			throw new NotFoundException();
 		}
-		
-        productDbo.setName(product.getName());
-        productDbo.setNumberOfUnits(product.getNumberOfUnits());
-        em.merge(productDbo);
-		System.out.println("update Product " + product + " with key " + product.getId());
+
+		if (logger.isLoggable(Level.INFO)) {
+			logger.info(serviceDescription + " :: update(" + primaryKeyAsString + ", " + product + ")");			
+		}
+
 		return Response.ok().build();
 	}
 

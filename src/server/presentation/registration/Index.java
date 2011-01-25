@@ -9,7 +9,8 @@ import javax.ejb.EJB;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 
-import server.business.boundry.ProductRegistrationService;
+import server.business.boundry.eao.EntityNotFoundException;
+import server.business.boundry.eao.ProductEao;
 import server.business.entity.Product;
 
 @Presenter
@@ -20,7 +21,7 @@ public class Index {
 	private static final String endpointDescription = ">>> From Faces 2.0";
 	
 	@EJB
-    ProductRegistrationService productRegistrationService;
+	ProductEao eao;
 
 	@Context
 	HttpServletRequest httpServletRequest;
@@ -41,26 +42,36 @@ public class Index {
     @PostConstruct
     public void init(){
     	product = new Product();
-    	sortedProducts = getAllProducts();
+    	sortedProducts = allProducts();
     }
     
     public String register(){
+		try {
+			eao.persist(product);
+		} catch (EntityNotFoundException e) {
+			// Do nothing
+		}
+
 		if (logger.isLoggable(Level.INFO)) {
 			logger.info(endpointDescription + " :: register()");
 		}
-        productRegistrationService.register(product);
-        return "confirm";
+
+		return "confirm";
     }
 
     public Product getProduct() {
         return product;
     }
     
-    public List<Product> getAllProducts() {
+    public List<Product> allProducts() {
+    	
+    	List<Product> products = eao.allProducts();
+    	
 		if (logger.isLoggable(Level.INFO)) {
-			logger.info(endpointDescription + " :: getAllProducts()");
+			logger.info(endpointDescription + " :: allProducts()");
 		}
-    	return productRegistrationService.getAllProducts();
+		
+    	return products;
     }
     
     public List<Product> getProducts() {

@@ -2,20 +2,19 @@ package server.business.boundry;
 
 import java.util.List;
 
-import javax.ws.rs.core.Response;
-
+import server.business.boundry.eao.EntityNotFoundException;
 import server.business.entity.Product;
 
 public interface ProductRegistration {
 
-	public abstract List<Product> getAllProducts();
+	public abstract List<Product> allProducts();
 
-	public abstract Response register(Product product);
+	public abstract Product register(Product product);
 
-	public abstract Product get(String primaryKeyAsString);
+	public abstract Product get(Long id) throws EntityNotFoundException;
 
-	public abstract Response delete(String primaryKeyAsString);
+	public abstract Product delete(Long id) throws EntityNotFoundException;
 
-	public abstract Response update(String primaryKeyAsString, Product product);
+	public abstract Product update(Long id, Product product) throws EntityNotFoundException;
 
 }

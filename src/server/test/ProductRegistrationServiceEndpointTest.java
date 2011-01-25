@@ -9,10 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import server.business.boundry.ProductRegistration;
+import server.business.boundry.eao.EntityNotFoundException;
 import server.business.entity.Product;
 
 import com.caucho.hessian.client.HessianProxyFactory;
-import com.sun.jersey.api.NotFoundException;
 
 public class ProductRegistrationServiceEndpointTest {
 	
@@ -31,15 +31,15 @@ public class ProductRegistrationServiceEndpointTest {
 	@Test
 	public void getAllProducts() {
 		
-		List<Product> products  = this.productRegistration.getAllProducts();
+		List<Product> products  = this.productRegistration.allProducts();
 		assertTrue(products.size() > 0);
 		
 	}
 	
 	@Test
-	public void getProduct() {
+	public void getProduct() throws EntityNotFoundException {
 		
-		Product product = this.productRegistration.get("1");
+		Product product = this.productRegistration.get(new Long(1));
 		assertEquals(1, product.getId().longValue());
 		assertEquals("android", product.getName());
 		assertEquals(666, product.getNumberOfUnits());
@@ -47,9 +47,9 @@ public class ProductRegistrationServiceEndpointTest {
 	}
 	
 	@Test
-	public void updateProduct() {
+	public void updateProduct() throws EntityNotFoundException {
 	
-		Product product = this.productRegistration.get("2");
+		Product product = this.productRegistration.get(new Long(2));
 		assertEquals(2, product.getId().longValue());
 		assertEquals("iPhone", product.getName());
 		assertEquals(10, product.getNumberOfUnits());
@@ -57,9 +57,9 @@ public class ProductRegistrationServiceEndpointTest {
 		product.setName("ZweiPhone");
 		product.setNumberOfUnits(11);
 
-		this.productRegistration.update("2", product);
+		this.productRegistration.update(new Long(2), product);
 		
-		Product updatedProduct = this.productRegistration.get("2");
+		Product updatedProduct = this.productRegistration.get(new Long(2));
 		assertEquals(2, updatedProduct.getId().longValue());
 		assertEquals("ZweiPhone", updatedProduct.getName());
 		assertEquals(11, updatedProduct.getNumberOfUnits());
@@ -67,13 +67,13 @@ public class ProductRegistrationServiceEndpointTest {
 	}
 	
 	@Test
-	public void registerProduct() {
+	public void registerProduct() throws EntityNotFoundException {
 	
 		Product product = new Product("Nokia", 321);
 
 		this.productRegistration.register(product);
 		
-		Product registeredProduct = this.productRegistration.get("5");
+		Product registeredProduct = this.productRegistration.get(new Long(5));
 		
 		assertEquals(5, registeredProduct.getId().longValue());
 		assertEquals("Nokia", registeredProduct.getName());
@@ -82,20 +82,20 @@ public class ProductRegistrationServiceEndpointTest {
 	}
 	
 	@Test
-	public void deleteProduct() {
+	public void deleteProduct() throws EntityNotFoundException {
 		
-		Product product = this.productRegistration.get("5");
+		Product product = this.productRegistration.get(new Long(5));
 		
 		assertEquals(5, product.getId().longValue());
 		assertEquals("Nokia", product.getName());
 		assertEquals(321, product.getNumberOfUnits());
 		
-		this.productRegistration.delete("5");
+		this.productRegistration.delete(new Long(5));
 		
 		try {
-			this.productRegistration.get("5");
-		} catch (NotFoundException nfe) {
-			assertNotNull(nfe);
+			this.productRegistration.get(new Long(5));
+		} catch (EntityNotFoundException e) {
+			assertNotNull(e);
 		}
 		
 	}

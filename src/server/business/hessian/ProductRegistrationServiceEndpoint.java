@@ -5,10 +5,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.EJB;
-import javax.ws.rs.core.Response;
 
 import server.business.boundry.ProductRegistration;
-import server.business.boundry.ProductRegistrationService;
+import server.business.boundry.eao.EntityNotFoundException;
+import server.business.boundry.eao.ProductEao;
 import server.business.entity.Product;
 
 import com.caucho.hessian.server.HessianServlet;
@@ -21,46 +21,54 @@ public class ProductRegistrationServiceEndpoint extends HessianServlet implement
 	
 	private static final String endpointDescription = ">>> From Hessian";
 	
-	@EJB ProductRegistrationService productRegistrationService;
+	@EJB
+	ProductEao eao;
 
 	@Override
-	public List<Product> getAllProducts() {
+	public List<Product> allProducts() {
 		if (logger.isLoggable(Level.INFO)) {
-			logger.info(endpointDescription + " :: getAllProducts()");
+			logger.info(endpointDescription + " :: allProducts()");
 		}
-		return productRegistrationService.getAllProducts();
+		return eao.allProducts();
 	}
 
 	@Override
-	public Response register(Product product) {
+	public Product register(Product product) {
+		
 		if (logger.isLoggable(Level.INFO)) {
-			logger.info(endpointDescription + " :: getAllProducts()");
+			logger.info(endpointDescription + " :: register()");
 		}
-		return productRegistrationService.register(product);
+		
+		try {
+			return eao.persist(product);
+		} catch (EntityNotFoundException e) {
+			// Do nothing
+		}
+		return null;
 	}
 
 	@Override
-	public Product get(String primaryKeyAsString) {
+	public Product get(Long id) throws EntityNotFoundException {
 		if (logger.isLoggable(Level.INFO)) {
-			logger.info(endpointDescription + " :: getAllProducts()");
+			logger.info(endpointDescription + " :: get(" + id + ")");
 		}
-		return productRegistrationService.get(primaryKeyAsString);
+		return eao.find(id);
 	}
 
 	@Override
-	public Response delete(String primaryKeyAsString) {
+	public Product delete(Long id) throws EntityNotFoundException {
 		if (logger.isLoggable(Level.INFO)) {
-			logger.info(endpointDescription + " :: getAllProducts()");
+			logger.info(endpointDescription + " :: delete( " + id + ")");
 		}
-		return productRegistrationService.delete(primaryKeyAsString);
+		return eao.remove(id);
 	}
 
 	@Override
-	public Response update(String primaryKeyAsString, Product product) {
+	public Product update(Long id, Product product) throws EntityNotFoundException {
 		if (logger.isLoggable(Level.INFO)) {
-			logger.info(endpointDescription + " :: getAllProducts()");
+			logger.info(endpointDescription + " :: update()");
 		}
-		return productRegistrationService.update(primaryKeyAsString, product);
+		return eao.merge(id, product);
 	}
 
 }
