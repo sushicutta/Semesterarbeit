@@ -73,7 +73,7 @@ public class ProductRegistrationService {
 			eao.persist(product);
 			
 			if (logger.isLoggable(Level.INFO)) {
-				logger.info(serviceDescription + " :: register()");			
+				logger.info(serviceDescription + " :: register(" + product + ")");			
 			}
 			
 			return Response.created(URI.create("/" + product.getId())).build();

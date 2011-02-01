@@ -61,6 +61,11 @@ public class ProductEao {
 	public List<Product> allProducts() {
 		@SuppressWarnings("unchecked")
 		List<Product> sortedProductList = (List<Product>)em.createNamedQuery(Product.ALL).getResultList();
+		
+		if (logger.isLoggable(Level.FINE)) {
+			logger.info(">>> Find all products");
+		}
+		
 		return sortedProductList;
 	}
 
@@ -72,7 +77,7 @@ public class ProductEao {
 			throw new EntityNotFoundException(Product.class, id);
 		}
 		
-		if (logger.isLoggable(Level.INFO)) {
+		if (logger.isLoggable(Level.FINE)) {
 			logger.info(">>> Find " + product + " with key " + product.getId());
 		}
 
@@ -89,7 +94,7 @@ public class ProductEao {
 		
 		em.persist(product);
 		
-		if (logger.isLoggable(Level.INFO)) {
+		if (logger.isLoggable(Level.FINE)) {
 			logger.info(">>> Persist " + product + " with key " + product.getId());
 		}
 		
@@ -103,7 +108,7 @@ public class ProductEao {
 		
 		em.remove(product);
 
-		if (logger.isLoggable(Level.INFO)) {
+		if (logger.isLoggable(Level.FINE)) {
 			logger.info(">>> Remove " + product + " with key " + id);
 		}
 		
@@ -119,7 +124,7 @@ public class ProductEao {
 
         em.merge(productDbo);
         
-		if (logger.isLoggable(Level.INFO)) {
+		if (logger.isLoggable(Level.FINE)) {
 			logger.info(">>> Merge " + productDbo + " with key " + productDbo.getId());
 		}
 

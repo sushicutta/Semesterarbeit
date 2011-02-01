@@ -25,22 +25,27 @@ public class ProductRegistrationServiceEndpoint extends HessianServlet implement
 	ProductEao eao;
 
 	@Override
-	public List<Product> allProducts() {
+	public Product [] allProducts() {
 		if (logger.isLoggable(Level.INFO)) {
 			logger.info(endpointDescription + " :: allProducts()");
 		}
-		return eao.allProducts();
+		List<Product> products = eao.allProducts();
+		Product productArray [] = new Product[products.size()];
+		productArray = products.toArray(productArray);
+		return productArray;
 	}
 
 	@Override
-	public Product register(Product product) {
+	public Product register(ch.hszt.semesterarbeit.Product product) {
 		
 		if (logger.isLoggable(Level.INFO)) {
-			logger.info(endpointDescription + " :: register()");
+			logger.info(endpointDescription + " :: register(" + product + ")");
 		}
 		
+		Product productToPersist = new Product(product);
+		
 		try {
-			return eao.persist(product);
+			return eao.persist(productToPersist);
 		} catch (EntityNotFoundException e) {
 			// Do nothing
 		}
@@ -58,17 +63,28 @@ public class ProductRegistrationServiceEndpoint extends HessianServlet implement
 	@Override
 	public Product delete(Long id) throws EntityNotFoundException {
 		if (logger.isLoggable(Level.INFO)) {
-			logger.info(endpointDescription + " :: delete( " + id + ")");
+			logger.info(endpointDescription + " :: delete(" + id + ")");
 		}
 		return eao.remove(id);
 	}
 
 	@Override
-	public Product update(Long id, Product product) throws EntityNotFoundException {
+	public Product update(Long id, ch.hszt.semesterarbeit.Product product) throws EntityNotFoundException {
 		if (logger.isLoggable(Level.INFO)) {
-			logger.info(endpointDescription + " :: update()");
+			logger.info(endpointDescription + " :: update(" + id + ", " + product + ")");
 		}
-		return eao.merge(id, product);
+		
+		Product productToMerge = new Product(product);
+		
+		return eao.merge(id, productToMerge);
+	}
+
+	@Override
+	public int add(int a, int b) {
+		if (logger.isLoggable(Level.INFO)) {
+			logger.info(endpointDescription + " :: add(" + a + ", " + b + ")");
+		}
+		return a + b;
 	}
 
 }

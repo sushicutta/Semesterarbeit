@@ -1,20 +1,20 @@
 package server.business.boundry;
 
-import java.util.List;
-
 import server.business.boundry.eao.EntityNotFoundException;
 import server.business.entity.Product;
 
 public interface ProductRegistration {
+	
+	public int add(int a, int b);
 
-	public abstract List<Product> allProducts();
+	public Product [] allProducts();
 
-	public abstract Product register(Product product);
+	public Product register(ch.hszt.semesterarbeit.Product product);
 
-	public abstract Product get(Long id) throws EntityNotFoundException;
+	public Product get(Long id) throws EntityNotFoundException;
 
-	public abstract Product delete(Long id) throws EntityNotFoundException;
+	public Product delete(Long id) throws EntityNotFoundException;
 
-	public abstract Product update(Long id, Product product) throws EntityNotFoundException;
+	public Product update(Long id, ch.hszt.semesterarbeit.Product product) throws EntityNotFoundException;
 
 }

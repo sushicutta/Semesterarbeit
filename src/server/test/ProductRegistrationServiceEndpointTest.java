@@ -1,9 +1,10 @@
 package server.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,10 +30,18 @@ public class ProductRegistrationServiceEndpointTest {
 	}
 	
 	@Test
+	public void add() {
+		
+		int added  = this.productRegistration.add(2, 3);
+		assertTrue(added == 5);
+		
+	}
+	
+	@Test
 	public void getAllProducts() {
 		
-		List<Product> products  = this.productRegistration.allProducts();
-		assertTrue(products.size() > 0);
+		Product [] products  = this.productRegistration.allProducts();
+		assertTrue(products.length > 0);
 		
 	}
 	
@@ -57,7 +66,7 @@ public class ProductRegistrationServiceEndpointTest {
 		product.setName("ZweiPhone");
 		product.setNumberOfUnits(11);
 
-		this.productRegistration.update(new Long(2), product);
+		this.productRegistration.update(new Long(2), product.toProduct());
 		
 		Product updatedProduct = this.productRegistration.get(new Long(2));
 		assertEquals(2, updatedProduct.getId().longValue());
@@ -69,7 +78,7 @@ public class ProductRegistrationServiceEndpointTest {
 	@Test
 	public void registerProduct() throws EntityNotFoundException {
 	
-		Product product = new Product("Nokia", 321);
+		ch.hszt.semesterarbeit.Product product = new ch.hszt.semesterarbeit.Product(null, "Nokia", 321);
 
 		this.productRegistration.register(product);
 		

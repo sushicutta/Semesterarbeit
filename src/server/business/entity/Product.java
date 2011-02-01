@@ -24,8 +24,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 })
 public class Product extends server.business.entity.Entity implements Serializable, Comparable<Product> {
 	
-	private static final long serialVersionUID = 8092491969425592554L;
-
+	private static final long serialVersionUID = 5602088193262392814L;
+	
 	public final static String ALL = "all";
 	public final static String COUNT = "count";
 
@@ -42,10 +42,16 @@ public class Product extends server.business.entity.Entity implements Serializab
 	public Product() {
 		// Wird bei JPA gebraucht.
 	}
-
+	
 	public Product(final String name, final int numberOfUnits) {
 		this.name = name;
 		this.numberOfUnits = numberOfUnits;
+	}
+	
+	public Product(ch.hszt.semesterarbeit.Product product) {
+		this.id = product.getId();
+		this.name = product.getName();
+		this.numberOfUnits = product.getNumberOfUnits();
 	}
 	
 	public void setId(Long id) {
@@ -75,6 +81,10 @@ public class Product extends server.business.entity.Entity implements Serializab
 	@Override
 	public String toString() {
 		return "Product{id=" + id + " name=" + name + " numberOfUnits=" + numberOfUnits + "}";
+	}
+	
+	public ch.hszt.semesterarbeit.Product toProduct() {
+		return new ch.hszt.semesterarbeit.Product(id, name, numberOfUnits);
 	}
 
 	@Override
