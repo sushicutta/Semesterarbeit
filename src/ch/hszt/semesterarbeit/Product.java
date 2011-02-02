@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class Product implements Serializable, Comparable<Product> {
 	
-	private static final long serialVersionUID = 666L;
+	private static final long serialVersionUID = 4230587722117557975L;
 
 	public static String OBJECT_NAME = "product";
 	
